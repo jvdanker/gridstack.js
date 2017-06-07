@@ -77,85 +77,26 @@
 
                 resize: function() {
 
-                    var outerDimensions,
-                        that = $( this ).resizable( "instance" ),
+                    var that = $( this ).resizable( "instance" ),
                         o = that.options,
                         cs = that.size,
                         os = that.originalSize,
-                        op = that.originalPosition,
-                        a = that.axis,
                         grid = typeof o.bootstrapGrid === "number" ? [ o.bootstrapGrid, o.bootstrapGrid ] : o.bootstrapGrid,
                         gridX = ( grid[ 0 ] || 1 ),
-                        gridY = ( grid[ 1 ] || 1 ),
-                        ox = Math.round( ( cs.width - os.width ) / gridX ) * gridX,
-                        oy = Math.round( ( cs.height - os.height ) / gridY ) * gridY,
-                        newWidth = os.width + ox,
-                        newHeight = os.height + oy,
-                        isMaxWidth = o.maxWidth && ( o.maxWidth < newWidth ),
-                        isMaxHeight = o.maxHeight && ( o.maxHeight < newHeight ),
-                        isMinWidth = o.minWidth && ( o.minWidth > newWidth ),
-                        isMinHeight = o.minHeight && ( o.minHeight > newHeight );
+                        ox = Math.round( ( cs.width - os.width ) / gridX ) * gridX;
 
                     o.bootstrapGrid = grid;
-
-                    if ( isMinWidth ) {
-                        newWidth += gridX;
-                    }
-                    if ( isMinHeight ) {
-                        newHeight += gridY;
-                    }
-                    if ( isMaxWidth ) {
-                        newWidth -= gridX;
-                    }
-                    if ( isMaxHeight ) {
-                        newHeight -= gridY;
-                    }
 
                     var currentCol = Math.round(ox / this.ppc);
                     var newCols = this.cols + currentCol > 0 ? this.cols + currentCol : 1;
                     var newClass = "col-md-" + newCols;
 //                    console.log(this.ppc, ox, currentCol, this.cols + currentCol, newCols);
 
-                    newWidth = os.width;
-                    newHeight = os.height;
-                    $($(this)[0]).attr('data-test', this.ppc);
-
                     $(this).removeClass(this.oldClass).addClass(newClass);
                     this.oldClass = newClass;
 
-                    if ( /^(se|s|e)$/.test( a ) ) {
-                        that.size.width = newWidth;
-                        that.size.height = newHeight;
-                    } else if ( /^(ne)$/.test( a ) ) {
-                        that.size.width = newWidth;
-                        that.size.height = newHeight;
-                        that.position.top = op.top - oy;
-                    } else if ( /^(sw)$/.test( a ) ) {
-                        that.size.width = newWidth;
-                        that.size.height = newHeight;
-                        that.position.left = op.left - ox;
-                    } else {
-                        if ( newHeight - gridY <= 0 || newWidth - gridX <= 0 ) {
-                            outerDimensions = that._getPaddingPlusBorderDimensions( this );
-                        }
-
-                        if ( newHeight - gridY > 0 ) {
-                            that.size.height = newHeight;
-                            that.position.top = op.top - oy;
-                        } else {
-                            newHeight = gridY - outerDimensions.height;
-                            that.size.height = newHeight;
-                            that.position.top = op.top + os.height - newHeight;
-                        }
-                        if ( newWidth - gridX > 0 ) {
-                            that.size.width = newWidth;
-                            that.position.left = op.left - ox;
-                        } else {
-                            newWidth = gridX - outerDimensions.width;
-                            that.size.width = newWidth;
-                            that.position.left = op.left + os.width - newWidth;
-                        }
-                    }
+                    that.size.width = os.width;
+                    that.size.height = os.height;
                 }
 
             } );
