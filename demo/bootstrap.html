@@ -8,6 +8,7 @@
     <title>Bootstrap 101 Template</title>
 
     <link href="../bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="../bower_components/jquery-ui/themes/base/jquery-ui.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../dist/gridstack.css"/>
 
     <style type="text/css">
@@ -20,18 +21,28 @@
             text-align: center;
             background-color: #18bc9c;
         }
+
+        [class*="col-"] {
+            padding-top: 15px;
+            padding-bottom: 15px;
+            background-color: rgba(86,61,124,.15);
+            border: 1px solid rgba(86,61,124,.2);
+        }
     </style>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="../bower_components/jquery-ui/jquery-ui.min.js"></script>
+    <script src="../bower_components/jquery-ui/jquery-ui.js"></script>
 </head>
 <body>
-    <h1>Hello, world!</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 resizable">test</div>
+            <div class="col-md-4 resizable">test</div>
+        </div>
+    </div>
 
     <div class="container-fluid">
-        <h1>Float grid demo</h1>
-
         <div>
             <a class="btn btn-default" id="add-new-widget" href="#">Add Widget</a>
         </div>
@@ -43,6 +54,117 @@
     </div>
 
     <script type="text/javascript">
+        $(document).ready(function () {
+            $.ui.plugin.add( "resizable", "bootstrapGrid", {
+
+                start: function() {
+                    this.cols = 1;
+                    this.oldClass = "";
+                    var classList = this[0].className.split(/\s+/);
+                    for (var i = 0; i < classList.length; i++) {
+                        var match = classList[i].match(/col-md-(.*)/i);
+                        if (match) {
+                            this.cols = parseInt(match[1]);
+                            this.oldClass = classList[i];
+                        }
+                    }
+                    this.ppc = Math.floor(this[0].offsetWidth / this.cols);
+                },
+
+                stop: function() {
+                    console.log('stop');
+                },
+
+                resize: function() {
+
+                    var outerDimensions,
+                        that = $( this ).resizable( "instance" ),
+                        o = that.options,
+                        cs = that.size,
+                        os = that.originalSize,
+                        op = that.originalPosition,
+                        a = that.axis,
+                        grid = typeof o.bootstrapGrid === "number" ? [ o.bootstrapGrid, o.bootstrapGrid ] : o.bootstrapGrid,
+                        gridX = ( grid[ 0 ] || 1 ),
+                        gridY = ( grid[ 1 ] || 1 ),
+                        ox = Math.round( ( cs.width - os.width ) / gridX ) * gridX,
+                        oy = Math.round( ( cs.height - os.height ) / gridY ) * gridY,
+                        newWidth = os.width + ox,
+                        newHeight = os.height + oy,
+                        isMaxWidth = o.maxWidth && ( o.maxWidth < newWidth ),
+                        isMaxHeight = o.maxHeight && ( o.maxHeight < newHeight ),
+                        isMinWidth = o.minWidth && ( o.minWidth > newWidth ),
+                        isMinHeight = o.minHeight && ( o.minHeight > newHeight );
+
+                    o.bootstrapGrid = grid;
+
+                    if ( isMinWidth ) {
+                        newWidth += gridX;
+                    }
+                    if ( isMinHeight ) {
+                        newHeight += gridY;
+                    }
+                    if ( isMaxWidth ) {
+                        newWidth -= gridX;
+                    }
+                    if ( isMaxHeight ) {
+                        newHeight -= gridY;
+                    }
+
+                    var currentCol = Math.round(ox / this.ppc);
+                    var newCols = this.cols + currentCol > 0 ? this.cols + currentCol : 1;
+                    var newClass = "col-md-" + newCols;
+//                    console.log(this.ppc, ox, currentCol, this.cols + currentCol, newCols);
+
+                    newWidth = os.width;
+                    newHeight = os.height;
+                    $($(this)[0]).attr('data-test', this.ppc);
+
+                    $(this).removeClass(this.oldClass).addClass(newClass);
+                    this.oldClass = newClass;
+
+                    if ( /^(se|s|e)$/.test( a ) ) {
+                        that.size.width = newWidth;
+                        that.size.height = newHeight;
+                    } else if ( /^(ne)$/.test( a ) ) {
+                        that.size.width = newWidth;
+                        that.size.height = newHeight;
+                        that.position.top = op.top - oy;
+                    } else if ( /^(sw)$/.test( a ) ) {
+                        that.size.width = newWidth;
+                        that.size.height = newHeight;
+                        that.position.left = op.left - ox;
+                    } else {
+                        if ( newHeight - gridY <= 0 || newWidth - gridX <= 0 ) {
+                            outerDimensions = that._getPaddingPlusBorderDimensions( this );
+                        }
+
+                        if ( newHeight - gridY > 0 ) {
+                            that.size.height = newHeight;
+                            that.position.top = op.top - oy;
+                        } else {
+                            newHeight = gridY - outerDimensions.height;
+                            that.size.height = newHeight;
+                            that.position.top = op.top + os.height - newHeight;
+                        }
+                        if ( newWidth - gridX > 0 ) {
+                            that.size.width = newWidth;
+                            that.position.left = op.left - ox;
+                        } else {
+                            newWidth = gridX - outerDimensions.width;
+                            that.size.width = newWidth;
+                            that.position.left = op.left + os.width - newWidth;
+                        }
+                    }
+                }
+
+            } );
+
+            $( ".resizable" ).resizable({
+                bootstrapGrid: [50, 50]
+            });
+        });
+
         $(function () {
             var options = {
                 float: true
