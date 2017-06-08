@@ -55,54 +55,8 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $.ui.plugin.add( "resizable", "bootstrapGrid", {
-
-                start: function() {
-                    this.cols = 1;
-                    this.oldClass = "";
-                    var classList = this[0].className.split(/\s+/);
-                    for (var i = 0; i < classList.length; i++) {
-                        var match = classList[i].match(/col-md-(.*)/i);
-                        if (match) {
-                            this.cols = parseInt(match[1]);
-                            this.oldClass = classList[i];
-                        }
-                    }
-                    this.ppc = Math.floor(this[0].offsetWidth / this.cols);
-                },
-
-                stop: function() {
-                    console.log('stop');
-                },
-
-                resize: function() {
-
-                    var that = $( this ).resizable( "instance" ),
-                        o = that.options,
-                        cs = that.size,
-                        os = that.originalSize,
-                        grid = typeof o.bootstrapGrid === "number" ? [ o.bootstrapGrid, o.bootstrapGrid ] : o.bootstrapGrid,
-                        gridX = ( grid[ 0 ] || 1 ),
-                        ox = Math.round( ( cs.width - os.width ) / gridX ) * gridX;
-
-                    o.bootstrapGrid = grid;
-
-                    var currentCol = Math.round(ox / this.ppc);
-                    var newCols = this.cols + currentCol > 0 ? this.cols + currentCol : 1;
-                    var newClass = "col-md-" + newCols;
-//                    console.log(this.ppc, ox, currentCol, this.cols + currentCol, newCols);
-
-                    $(this).removeClass(this.oldClass).addClass(newClass);
-                    this.oldClass = newClass;
-
-                    that.size.width = os.width;
-                    that.size.height = os.height;
-                }
-
-            } );
-
-            $( ".resizable" ).resizable({
-                bootstrapGrid: [50, 50]
+            $('.resizable').resizable({
+                bootstrapGrid: [5, 5]
             });
         });
 
@@ -148,5 +102,6 @@
     <script src="../bower_components/lodash/dist/lodash.js"></script>
     <script src="../src/gridstack.js"></script>
     <script src="../src/gridstack.jQueryUI.js"></script>
+    <script src="../src/gridstack-bootstrap.js"></script>
 </body>
 </html>
